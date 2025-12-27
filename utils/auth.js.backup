@@ -1,0 +1,78 @@
+// Simple email validation
+export const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+// Simulate authentication (replace with your actual auth service)
+export const authenticateUser = async (email, password) => {
+  try {
+    // In a real app, this would call your authentication service
+    // For demo, we'll simulate a network call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simulate authentication check
+    // Admin credentials
+    if (email === "Jairdandantas@gmail.com" && password === "SpaceWalk!!_25") {
+      return { success: true, user: { email, name: "Administrator", role: "admin" } };
+    }
+    // Demo user credentials
+    if (email === "demo@example.com" && password === "password") {
+      return { success: true, user: { email, name: "Demo User", role: "user" } };
+    }
+    
+    return { 
+      success: false, 
+      error: "Invalid email or password" 
+    };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: "Authentication failed. Please try again." 
+    };
+  }
+};
+
+// Simulate password reset request
+export const requestPasswordReset = async (email) => {
+  try {
+    // In a real app, this would:
+    // 1. Generate a secure reset token
+    // 2. Save it to the database with an expiry
+    // 3. Send an email with a reset link
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simulate email sending
+    console.log(`Password reset email sent to: ${email}`);
+    
+    return {
+      success: true,
+      message: "If an account exists with this email, you will receive a password reset link shortly."
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Failed to send reset email. Please try again."
+    };
+  }
+};
+
+// Simulate password reset verification
+export const resetPassword = async (token, newPassword) => {
+  try {
+    // In a real app, this would:
+    // 1. Verify the reset token
+    // 2. Check it hasn't expired
+    // 3. Update the password in your database
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      success: true,
+      message: "Password has been reset successfully."
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "Invalid or expired reset link. Please request a new one."
+    };
+  }
+};

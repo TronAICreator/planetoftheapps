@@ -1,0 +1,32 @@
+import lessons from "../../../data/lessons.json";
+
+export const metadata = { title: "Admin | Phonics Academy" };
+
+export default function AdminPage() {
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10">
+      <h1 className="font-display text-4xl text-brand-blue">Admin (Read-only)</h1>
+      <p className="mt-2 text-gray-700">
+        This is the last known stable admin view (no editing). Use it to review lesson entries.
+      </p>
+      <table className="mt-6 w-full border border-gray-200 text-sm">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="text-left p-2 border-b">ID</th>
+            <th className="text-left p-2 border-b">Title</th>
+            <th className="text-left p-2 border-b">Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lessons.map(l => (
+            <tr key={l.id} className="odd:bg-white even:bg-gray-50">
+              <td className="p-2 align-top border-b">{l.id}</td>
+              <td className="p-2 align-top border-b">{l.title}</td>
+              <td className="p-2 align-top border-b">{l.summary}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

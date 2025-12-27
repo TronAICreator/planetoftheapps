@@ -1,0 +1,144 @@
+"use client";
+import { useState, useEffect } from 'react';
+import LessonNavigation from '../../../components/LessonNavigation';
+import PhonicsLesson from '../../../components/PhonicsLesson';
+import { speakText, SPEECH_SETTINGS } from '../../../utils/phonics';
+import lessons from '../../../data/lessons.json';
+
+export default function LessonsPage() {
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [currentPage, setCurrentPage] = useState(null);
+  const [hoveredWord, setHoveredWord] = useState(null);
+
+  useEffect(() => {
+    // Initialize with first lesson and first page
+    if (lessons.length > 0) {
+      const firstLesson = lessons[0];
+      setCurrentLesson(firstLesson);
+      if (firstLesson.pages && firstLesson.pages.length > 0) {
+        setCurrentPage(firstLesson.pages[0]);
+      }
+    }
+  }, []);
+
+  const handleLessonChange = (lesson) => {
+    setCurrentLesson(lesson);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleWordHover = (word, index) => {
+    setHoveredWord(index);
+    speakText(word.replace(/[.,!?;]/, ''), SPEECH_SETTINGS.word);
+    setTimeout(() => setHoveredWord(null), 1000);
+  };
+
+  const renderInteractiveText = (text) => {
+    if (!text) return null;
+    
+    return text.split(' ').map((word, index) => (
+      <span
+        key={index}
+        className={`cursor-pointer transition-all duration-300 px-2 py-1 rounded-md inline-block m-1 ${
+          hoveredWord === index 
+            ? 'bg-orange-200 text-orange-800 shadow-lg scale-110 font-bold' 
+            : 'hover:bg-yellow-200 hover:shadow-sm hover:scale-105'
+        }`}
+        onMouseEnter={() => handleWordHover(word.replace(/[.,!?;]/, ''), index)}
+        title={`Click to hear: "${word.replace(/[.,!?;]/, '')}"`}
+      >
+        {word}
+      </span>
+    ));
+  };
+
+  if (!currentLesson || !currentPage) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-8">
+        <div className="text-center">
+          <p className="text-gray-600">Loading lessons...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Header */}
+      <div className="bg-white shadow-md border-b-4 border-blue-300 p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-blue-600">
+            🎓 Phonics Academy
+          </h1>
+          <div className="text-right">
+            <h2 className="text-xl font-semibold text-gray-800">
+              {currentLesson.title}
+            </h2>
+            <p className="text-sm text-gray-600">{currentLesson.summary}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content with Navigation */}
+      <div className="max-w-7xl mx-auto p-8">
+        <LessonNavigation
+          lessons={lessons}
+          currentLesson={currentLesson}
+          currentPage={currentPage}
+          onLessonChange={handleLessonChange}
+          onPageChange={handlePageChange}
+        />
+
+        {/* Lesson Content */}
+        <div className="lesson-content bg-white rounded-lg shadow-lg p-8 mb-8">
+          {/* Page Content */}
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              Page {currentLesson.pages.findIndex(p => p.id === currentPage.id) + 1}
+            </h3>
+            
+            {/* Interactive Text */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-6 mb-6">
+              <h4 className="text-lg font-medium text-gray-700 mb-4">
+                📖 Read Along (hover over words to hear them):
+              </h4>
+              <div className="text-xl leading-relaxed">
+                {renderInteractiveText(currentPage.content)}
+              </div>
+            </div>
+
+            {/* Focus Phonic Highlight */}
+            {currentPage.focus && (
+              <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-6">
+                <h4 className="text-lg font-medium text-yellow-800 mb-2">
+                  🎯 Focus Sound: <span className="text-2xl font-bold text-yellow-600">{currentPage.focus}</span>
+                </h4>
+                <p className="text-yellow-700">
+                  Listen for the "{currentPage.focus}" sound as you read!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Phonics Practice Section */}
+          {currentLesson.missingPhonic && (
+            <div className="border-t-2 border-gray-200 pt-8">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">
+                🎤 Practice Recording
+              </h3>
+              <PhonicsLesson 
+                lesson={currentLesson} 
+                onComplete={() => {
+                  // Mark page as completed
+                  console.log('Page completed');
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
